@@ -101,7 +101,7 @@ export class SetupGitlabStack extends cdk.Stack {
       }),
       workingDirectory: '/data',
       environment: {
-        'GITLAB_URL_BASE': 'http://SetupG-gitla-D5aUiTxymtgk-1865741901.eu-central-1.elb.amazonaws.com'
+        'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud'
         
       }
     };
