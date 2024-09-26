@@ -101,7 +101,7 @@ export class SetupGitlabStack extends cdk.Stack {
       }),
       workingDirectory: '/data',
       environment: {
-        'GITNESS_URL_BASE': 'http://setupg-gitne-ogolf6qwikx9-33268151.eu-central-1.elb.amazonaws.com'
+        'GITLAB_URL_BASE': 'http://SetupG-gitla-D5aUiTxymtgk-1865741901.eu-central-1.elb.amazonaws.com'
         
       }
     };
@@ -137,14 +137,12 @@ export class SetupGitlabStack extends cdk.Stack {
       circuitBreaker: {
         rollback: true,
       },
-      memoryLimitMiB: 512, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
-      cpu: 256,
+      memoryLimitMiB: 1024, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
+      cpu: 512,
       desiredCount: 1,
       taskDefinition: taskDefinition,
       securityGroups: [webSecurityGroup]
     });
-    //service.loadBalancer.loadBalancerSecurityGroups.forEach(securityGroup => webSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80)));
-
   }
 
 }
