@@ -99,9 +99,10 @@ export class SetupGitlabStack extends cdk.Stack {
       logging: new ecs.AwsLogDriver({
         streamPrefix: 'gitlab',
       }),
-      workingDirectory: '/data',
+      workingDirectory: '/data/GitLab',
       environment: {
-        'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud'
+        'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud',
+        'GITLAB_HOME': '/data/GitLab'
       }
     };
 /*
