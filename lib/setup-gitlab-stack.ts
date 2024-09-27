@@ -122,7 +122,7 @@ export class SetupGitlabStack extends cdk.Stack {
     };
 
     const configVolume = {
-      name: "$GITLAB_HOME/config",
+      name: "config",
       efcVolumenConfigConfig,
 
     };
@@ -145,7 +145,7 @@ export class SetupGitlabStack extends cdk.Stack {
     };
 
     const logsVolume = {
-      name: "$GITLAB_HOME/logs",
+      name: "logs",
       efcVolumenConfigLogs,
 
     };
@@ -168,7 +168,7 @@ export class SetupGitlabStack extends cdk.Stack {
     };
 
     const dataVolume = {
-      name: "$GITLAB_HOME/logs",
+      name: "data",
       efcVolumenConfigData,
 
     };
