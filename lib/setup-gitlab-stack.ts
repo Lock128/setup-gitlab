@@ -72,14 +72,7 @@ export class SetupGitlabStack extends cdk.Stack {
       }
     });
 
-    const efsVolumeConfiguration: ecs.EfsVolumeConfiguration = {
-      authorizationConfig: {
-        accessPointId: accessPoint.accessPointId,
-        iam: 'ENABLED',
-      },
-      fileSystemId: fileSystem.fileSystemId,
-      transitEncryption: 'ENABLED',
-    };
+
 
 
     //https://hub.docker.com/r/gitlab/gitlab-ce
@@ -102,39 +95,97 @@ export class SetupGitlabStack extends cdk.Stack {
       workingDirectory: '/data',
       environment: {
         'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud',
-        'GITLAB_HOME': '/data/GitLab'
+        'GITLAB_HOME': '/data'
       }
     };
-/*
-    container.addMountPoints({
-      sourceVolume: assetVolume.name,
-      containerPath: "/mnt/assets",
-      readOnly: false,
-    });
-    */
-    
-    const volume = {
-      // Use an Elastic FileSystem
-      name: "data",
-      efsVolumeConfiguration
-    };
-    taskDefinition.addVolume(volume);
+
     const container = taskDefinition.addContainer('defaultContainer', containerDefinition);
     container.addPortMappings({
       containerPort: 3000,
       hostPort: 3000,
       protocol: ecs.Protocol.TCP,
     });
+        /*
+    - '$GITLAB_HOME/config:/etc/gitlab'
+    - '$GITLAB_HOME/logs:/var/log/gitlab'
+    - '$GITLAB_HOME/data:/var/opt/gitlab'
+    */
+
+    const efcVolumenConfigConfig: ecs.EfsVolumeConfiguration = {
+      authorizationConfig: {
+        accessPointId: accessPoint.accessPointId,
+        iam: 'ENABLED',
+      },
+      fileSystemId: fileSystem.fileSystemId,
+      transitEncryption: 'ENABLED',
+      rootDirectory: '/config'
+    };
+
+    const configVolume = {
+      name: "$GITLAB_HOME/config",
+      efcVolumenConfigConfig,
+
+    };
+
+    taskDefinition.addVolume(configVolume);
     container.addMountPoints({
-      sourceVolume: volume.name,
-      containerPath: "/data",
+      sourceVolume: configVolume.name,
+      containerPath: "/etc/gitlab",
       readOnly: false,
     });
+
+    const efcVolumenConfigLogs: ecs.EfsVolumeConfiguration = {
+      authorizationConfig: {
+        accessPointId: accessPoint.accessPointId,
+        iam: 'ENABLED',
+      },
+      fileSystemId: fileSystem.fileSystemId,
+      transitEncryption: 'ENABLED',
+      rootDirectory: '/logs'
+    };
+
+    const logsVolume = {
+      name: "$GITLAB_HOME/logs",
+      efcVolumenConfigLogs,
+
+    };
+
+    taskDefinition.addVolume(logsVolume);
+    container.addMountPoints({
+      sourceVolume: logsVolume.name,
+      containerPath: "/var/log/gitlab",
+      readOnly: false,
+    });
+
+    const efcVolumenConfigData: ecs.EfsVolumeConfiguration = {
+      authorizationConfig: {
+        accessPointId: accessPoint.accessPointId,
+        iam: 'ENABLED',
+      },
+      fileSystemId: fileSystem.fileSystemId,
+      transitEncryption: 'ENABLED',
+      rootDirectory: '/data'
+    };
+
+    const dataVolume = {
+      name: "$GITLAB_HOME/logs",
+      efcVolumenConfigData,
+
+    };
+
+    taskDefinition.addVolume(dataVolume);
+    container.addMountPoints({
+      sourceVolume: dataVolume.name,
+      containerPath: "/var/opt/gitlab",
+      readOnly: false,
+    });
+
 
     // Create higher level construct containing the Fargate service with a load balancer
     const service = new ecspatterns.ApplicationLoadBalancedFargateService(this, 'gitlab-service', {
       cluster,
       circuitBreaker: {
+        
         rollback: true,
       },
       memoryLimitMiB: 1024, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
