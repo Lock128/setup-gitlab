@@ -31,4 +31,4 @@ jobs:
     - name: Destroy CDK Application
       run: |
         npm run build
-        npx cdk destroy --app-complete --require-approval never
+        npx cdk destroy --app-complete --require-approval never  -f --all
