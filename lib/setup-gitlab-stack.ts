@@ -188,11 +188,12 @@ export class SetupGitlabStack extends cdk.Stack {
         
         rollback: true,
       },
-      memoryLimitMiB: 1024, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
-      cpu: 512,
+      memoryLimitMiB: 8192, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
+      cpu: 4096,
       desiredCount: 1,
       taskDefinition: taskDefinition,
-      securityGroups: [webSecurityGroup]
+      securityGroups: [webSecurityGroup],
+      healthCheckGracePeriod: cdk.Duration.minutes(15)
     });
   }
 
