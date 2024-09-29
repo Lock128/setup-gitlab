@@ -83,7 +83,7 @@ export class SetupGitlabStack extends cdk.Stack {
       compatibility: ecs.Compatibility.FARGATE,
       memoryMiB: '8192',
       cpu: '2048',
-
+      
     });
     fileSystem.grantRootAccess(taskDefinition.taskRole);
 
@@ -91,15 +91,16 @@ export class SetupGitlabStack extends cdk.Stack {
       image: ecs.ContainerImage.fromRegistry('gitlab/gitlab-ce'),
       logging: new ecs.AwsLogDriver({
         streamPrefix: 'gitlab',
+        logRetention: logs.RetentionDays.THREE_DAYS,
       }),
       workingDirectory: '/data',
       environment: {
         'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud',
         'GITLAB_HOME': '/data'
       },
-      linuxParameters: new ecs.LinuxParameters(this, 'LinuxParameters', {
+      /*linuxParameters: new ecs.LinuxParameters(this, 'LinuxParameters', {
         sharedMemorySize: 1024,
-      }),
+      }),*/
     };
 
     const container = taskDefinition.addContainer('defaultContainer', containerDefinition);
