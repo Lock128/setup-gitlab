@@ -79,9 +79,6 @@ export class SetupGitlabStack extends cdk.Stack {
       }
     });
 
-
-
-
     //https://hub.docker.com/r/gitlab/gitlab-ce
     const image = ecs.ContainerImage.fromRegistry('gitlab/gitlab-ce');
 
@@ -100,6 +97,7 @@ export class SetupGitlabStack extends cdk.Stack {
         streamPrefix: 'gitlab',
         logRetention: logs.RetentionDays.THREE_DAYS,
       }),
+      
       workingDirectory: '/data',
       environment: {
         'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud',
@@ -114,6 +112,16 @@ export class SetupGitlabStack extends cdk.Stack {
     container.addPortMappings({
       containerPort: 3000,
       hostPort: 3000,
+      protocol: ecs.Protocol.TCP,
+    });
+    container.addPortMappings({
+      containerPort: 80,
+      hostPort: 80,
+      protocol: ecs.Protocol.TCP,
+    });
+    container.addPortMappings({
+      containerPort: 9093,
+      hostPort: 9093,
       protocol: ecs.Protocol.TCP,
     });
         /*
