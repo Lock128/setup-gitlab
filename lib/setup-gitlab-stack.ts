@@ -81,8 +81,8 @@ export class SetupGitlabStack extends cdk.Stack {
 
     const taskDefinition = new ecs.TaskDefinition(this, 'gitlab-web-task', {
       compatibility: ecs.Compatibility.FARGATE,
-      memoryMiB: '8192',
-      cpu: '2048',
+      memoryMiB: '16384',
+      cpu: '8192',
       
     });
     fileSystem.grantRootAccess(taskDefinition.taskRole);
