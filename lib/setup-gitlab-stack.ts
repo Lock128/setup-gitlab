@@ -49,9 +49,16 @@ export class SetupGitlabStack extends cdk.Stack {
 
     webSecurityGroup.addIngressRule(
       webSecurityGroup,
-      ec2.Port.tcp(2049) // Enable NFS service within security group
+      ec2.Port.tcp(2049), // Enable NFS service within security group
     );
-
+    webSecurityGroup.addIngressRule(
+      webSecurityGroup,
+      ec2.Port.tcp(8001),
+    );
+    webSecurityGroup.addIngressRule(
+      webSecurityGroup,
+      ec2.Port.udp(8001)
+    );
 
     const fileSystem = new efs.FileSystem(this, "EfsFileSystem", {
       vpc,
@@ -194,12 +201,12 @@ export class SetupGitlabStack extends cdk.Stack {
         
         rollback: true,
       },
-      memoryLimitMiB: 8192, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
-      cpu: 4096,
+      memoryLimitMiB: 16384, // Supported configurations: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_ecs_patterns.ApplicationMultipleTargetGroupsFargateService.html#memorylimitmib
+      cpu: 8192,
       desiredCount: 1,
       taskDefinition: taskDefinition,
       securityGroups: [webSecurityGroup],
-      healthCheckGracePeriod: cdk.Duration.minutes(15)
+      healthCheckGracePeriod: cdk.Duration.minutes(30)
     });
   }
 
