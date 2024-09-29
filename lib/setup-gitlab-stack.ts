@@ -81,8 +81,8 @@ export class SetupGitlabStack extends cdk.Stack {
 
     const taskDefinition = new ecs.TaskDefinition(this, 'gitlab-web-task', {
       compatibility: ecs.Compatibility.FARGATE,
-      memoryMiB: '512',
-      cpu: '256',
+      memoryMiB: '8192',
+      cpu: '2048',
 
     });
     fileSystem.grantRootAccess(taskDefinition.taskRole);
@@ -96,7 +96,10 @@ export class SetupGitlabStack extends cdk.Stack {
       environment: {
         'GITLAB_URL_BASE': 'http://gitlab.lockhead.cloud',
         'GITLAB_HOME': '/data'
-      }
+      },
+      linuxParameters: new ecs.LinuxParameters(this, 'LinuxParameters', {
+        sharedMemorySize: 1024,
+      }),
     };
 
     const container = taskDefinition.addContainer('defaultContainer', containerDefinition);
@@ -128,6 +131,7 @@ export class SetupGitlabStack extends cdk.Stack {
     };
 
     taskDefinition.addVolume(configVolume);
+
     container.addMountPoints({
       sourceVolume: configVolume.name,
       containerPath: "/etc/gitlab",
@@ -174,6 +178,7 @@ export class SetupGitlabStack extends cdk.Stack {
     };
 
     taskDefinition.addVolume(dataVolume);
+
     container.addMountPoints({
       sourceVolume: dataVolume.name,
       containerPath: "/var/opt/gitlab",
